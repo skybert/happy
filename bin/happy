@@ -1,0 +1,28 @@
+#! /usr/bin/env bash
+
+## author: torstein, torstein@skybert.net
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+main() {
+  local _cwd=
+  _cwd="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
+
+  local _date=${1:-$(date --iso)}
+
+  f=$HOME/doc/scribbles/$(date +%Y)/${_date}.org
+  test -r "${f}" || {
+    printf "Didn't work on %s\\n" "${_date}"
+    exit 1
+  }
+
+  grep -E '(Daily|Support|Coding|Review|Specification)' "${f}" |
+    grep ^'|' |
+    grep -v '\\_' |
+    tr -d '|' |
+    awk -f "${_cwd}/../lib/happy.awk"
+}
+
+main "$@"
